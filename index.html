@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kama Ground Intelligence</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+<body class="bg-gray-100 min-h-screen p-6">
+
+  <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-xl p-6">
+
+    <h1 class="text-3xl font-bold mb-6 text-center">Kama Ground Intelligence System</h1>
+
+    <!-- Village Info -->
+    <div class="grid md:grid-cols-3 gap-4 mb-8">
+      <div>
+        <label class="font-semibold">Village Name</label>
+        <input id="village" type="text" class="w-full border rounded-lg p-3 mt-1" placeholder="Enter village name">
+      </div>
+
+      <div>
+        <label class="font-semibold">Booth Number</label>
+        <input id="booth" type="text" class="w-full border rounded-lg p-3 mt-1" placeholder="Enter booth number">
+      </div>
+
+      <div>
+        <label class="font-semibold">Worker Name</label>
+        <input id="worker" type="text" class="w-full border rounded-lg p-3 mt-1" placeholder="Enter worker name">
+      </div>
+    </div>
+
+    <!-- Layer 1 -->
+    <div class="mb-8">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-2xl font-bold">Layer 1 - Power Holders</h2>
+        <button onclick="addLayer1()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          + Add Person
+        </button>
+      </div>
+
+      <div id="layer1Container" class="space-y-4"></div>
+    </div>
+
+    <!-- Export Button -->
+    <div class="text-center mt-8">
+      <button onclick="exportExcel()" class="bg-green-600 text-white px-8 py-4 rounded-xl text-lg hover:bg-green-700">
+        Export To Excel
+      </button>
+    </div>
+
+  </div>
+
+  <script>
+
+    let layer1Count = 0;
+
+    function addLayer1() {
+      layer1Count++;
+
+      const container = document.getElementById('layer1Container');
+
+      const div = document.createElement('div');
+      div.className = 'border rounded-xl p-4 bg-gray-50';
+
+      div.innerHTML = `
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-bold text-lg">Person ${layer1Count}</h3>
+          <button onclick="this.parentElement.parentElement.remove()" class="text-red-600 font-bold">Remove</button>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-4">
+          <div>
+            <label class="font-semibold">Full Name</label>
+            <input type="text" class="name w-full border rounded-lg p-3 mt-1" placeholder="Enter full name">
+          </div>
+
+          <div>
+            <label class="font-semibold">Mobile Number</label>
+            <input type="text" class="mobile w-full border rounded-lg p-3 mt-1" placeholder="Enter mobile number">
+          </div>
+
+          <div>
+            <label class="font-semibold">Mukhiya</label>
+            <select class="mukhiya w-full border rounded-lg p-3 mt-1">
+              <option>Yes</option>
+              <option>No</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-semibold">Influence Level</label>
+            <select class="influence w-full border rounded-lg p-3 mt-1">
+              <option>Low</option>
+              <option>Medium</option>
+              <option>High</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="font-semibold">Main Issue</label>
+            <input type="text" class="issue w-full border rounded-lg p-3 mt-1" placeholder="Village issue">
+          </div>
+
+          <div>
+            <label class="font-semibold">Notes</label>
+            <input type="text" class="notes w-full border rounded-lg p-3 mt-1" placeholder="Extra notes">
+          </div>
+        </div>
+      `;
+
+      container.appendChild(div);
+    }
+
+    // Default one form
+    addLayer1();
+
+    function exportExcel() {
+
+      const village = document.getElementById('village').value;
+      const booth = document.getElementById('booth').value;
+      const worker = document.getElementById('worker').value;
+
+      const cards = document.querySelectorAll('#layer1Container > div');
+
+      const data = [];
+
+      cards.forEach(card => {
+        const row = {
+          Village: village,
+          Booth: booth,
+          Worker: worker,
+          Name: card.querySelector('.name').value,
+          Mobile: card.querySelector('.mobile').value,
+          Mukhiya: card.querySelector('.mukhiya').value,
+          Influence: card.querySelector('.influence').value,
+          Issue: card.querySelector('.issue').value,
+          Notes: card.querySelector('.notes').value,
+        };
+
+        data.push(row);
+      });
+
+      const worksheet = XLSX.utils.json_to_sheet(data);
+      const workbook = XLSX.utils.book_new();
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Layer1');
+
+      XLSX.writeFile(workbook, `${village}_Layer1_Data.xlsx`);
+    }
+
+  </script>
+
+</body>
+</html>
